@@ -37,9 +37,10 @@ jobs:
     - name: Build Checkpoint
       run: |
         make switch -j$(nproc)
+        mv switch/out/Checkpoint.nro switch/Checkpoint/Checkpoint.nro
 
     - uses: actions/upload-artifact@master
       with:
         name: Checkpoint
-        path: Checkpoint.nro
+        path: switch/Checkpoint/Checkpoint.nro
         if-no-files-found: error

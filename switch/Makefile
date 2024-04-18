@@ -53,7 +53,7 @@ CHEATS			:=	cheats
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
 CFLAGS	:=	-g -Wall -Wextra -O3 -ffunction-sections -flto \
-			-Wno-write-strings -Wno-unused-value -fomit-frame-pointer \
+			-Wno-write-strings -Wno-unused-value -Wno-unused-parameter -fomit-frame-pointer \
 			$(ARCH) $(DEFINES) \
 			-DVERSION_MAJOR=${VERSION_MAJOR} \
 			-DVERSION_MINOR=${VERSION_MINOR} \
