@@ -1,0 +1,45 @@
+name: Build Checkpoint
+
+on: [push, pull_request]
+
+jobs:
+  Checkpoint:
+    runs-on: ubuntu-latest
+    container: devkitpro/devkita64:latest
+
+    steps:
+    - uses: actions/checkout@master
+      with:
+        submodules: recursive
+
+    - name: Update packages
+      run: |
+        sudo -n apt-get update
+        sudo -n apt-get upgrade -y patch autoconf automake diffutils pkgconf fakeroot git file tar bzip2 zstd
+        sudo -n dkp-pacman --noconfirm -U \
+          "https://wii.leseratte10.de/devkitPro/other-stuff/dkp-toolchain-vars-1.0.2-1-any.pkg.tar.xz"
+
+    - name: Silence all git safe directory warnings
+      run: git config --system --add safe.directory '*'
+
+    - name: Checkout latest libnx commit
+      run: |
+        git clone --recurse-submodules https://github.com/R-YaTian/libnx.git
+
+    - name: Set workspace permissions
+      run: chmod 777 -R "$GITHUB_WORKSPACE"
+
+    - name: Build and install libnx
+      run: |
+        cd libnx
+        make install -j$(nproc)
+
+    - name: Build Checkpoint
+      run: |
+        make switch -j$(nproc)
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: Checkpoint
+        path: Checkpoint.nro
+        if-no-files-found: error
