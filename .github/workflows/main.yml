@@ -38,6 +38,7 @@ jobs:
       run: |
         sed -i -e '$d' sharkive/joiner.py
         make switch -j$(nproc)
+        mkdir "switch/Checkpoint"
         mv switch/out/Checkpoint.nro switch/Checkpoint/Checkpoint.nro
 
     - uses: actions/upload-artifact@master
