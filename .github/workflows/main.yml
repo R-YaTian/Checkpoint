@@ -36,7 +36,7 @@ jobs:
 
     - name: Build Checkpoint
       run: |
-        sed -i -e '$d' Sharkive/joiner.py
+        sed -i -e '$d' sharkive/joiner.py
         make switch -j$(nproc)
         mv switch/out/Checkpoint.nro switch/Checkpoint/Checkpoint.nro
 
