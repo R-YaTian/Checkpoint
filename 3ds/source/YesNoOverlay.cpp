@@ -40,8 +40,8 @@ YesNoOverlay::YesNoOverlay(
     posx = ceilf(320 - text.width * 0.6) / 2;
     posy = 40 + ceilf(120 - 0.6f * fontGetInfo(NULL)->lineFeed) / 2;
 
-    buttonYes = std::make_unique<Clickable>(42, 162, 116, 36, COLOR_GREY_DARK, COLOR_WHITE, "\uE000 Yes", true);
-    buttonNo  = std::make_unique<Clickable>(162, 162, 116, 36, COLOR_GREY_DARK, COLOR_WHITE, "\uE001 No", true);
+    buttonYes = std::make_unique<Clickable>(42, 162, 116, 36, COLOR_GREY_DARK, COLOR_WHITE, "\uE000 是", true);
+    buttonNo  = std::make_unique<Clickable>(162, 162, 116, 36, COLOR_GREY_DARK, COLOR_WHITE, "\uE001 否", true);
 }
 
 YesNoOverlay::~YesNoOverlay(void)

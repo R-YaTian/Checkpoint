@@ -36,10 +36,10 @@ MainScreen::MainScreen(void) : hid(rowlen * collen, collen)
     staticBuf  = C2D_TextBufNew(261);
     dynamicBuf = C2D_TextBufNew(256);
 
-    buttonBackup    = std::make_unique<Clickable>(204, 102, 110, 35, COLOR_GREY_DARKER, COLOR_WHITE, "Backup \uE004", true);
-    buttonRestore   = std::make_unique<Clickable>(204, 139, 110, 35, COLOR_GREY_DARKER, COLOR_WHITE, "Restore \uE005", true);
-    buttonCheats    = std::make_unique<Clickable>(204, 176, 110, 36, COLOR_GREY_DARKER, COLOR_WHITE, "Cheats", true);
-    buttonPlayCoins = std::make_unique<Clickable>(204, 176, 110, 36, COLOR_GREY_DARKER, COLOR_WHITE, "\uE075 Coins", true);
+    buttonBackup    = std::make_unique<Clickable>(204, 102, 110, 35, COLOR_GREY_DARKER, COLOR_WHITE, "备份 \uE004", true);
+    buttonRestore   = std::make_unique<Clickable>(204, 139, 110, 35, COLOR_GREY_DARKER, COLOR_WHITE, "恢复 \uE005", true);
+    buttonCheats    = std::make_unique<Clickable>(204, 176, 110, 36, COLOR_GREY_DARKER, COLOR_WHITE, "金手指", true);
+    buttonPlayCoins = std::make_unique<Clickable>(204, 176, 110, 36, COLOR_GREY_DARKER, COLOR_WHITE, "\uE075 游戏金币", true);
     directoryList   = std::make_unique<Scrollable>(6, 102, 196, 110, 5);
     buttonBackup->canChangeColorWhenSelected(true);
     buttonRestore->canChangeColorWhenSelected(true);
@@ -48,23 +48,23 @@ MainScreen::MainScreen(void) : hid(rowlen * collen, collen)
 
     sprintf(ver, "v%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_MICRO);
 
-    C2D_TextParse(&ins1, staticBuf, "Hold SELECT to see commands. Press \uE002 for ");
-    C2D_TextParse(&ins2, staticBuf, "extdata");
+    C2D_TextParse(&ins1, staticBuf, "按住 SELECT 查看命令. 按 \uE002 切换至");
+    C2D_TextParse(&ins2, staticBuf, "追加数据");
     C2D_TextParse(&ins3, staticBuf, ".");
-    C2D_TextParse(&ins4, staticBuf, "Press \uE073 or START to exit.");
+    C2D_TextParse(&ins4, staticBuf, "按 \uE073 或 START 退出.");
     C2D_TextParse(&version, staticBuf, ver);
-    C2D_TextParse(&checkpoint, staticBuf, "checkpoint");
-    C2D_TextParse(&c2dId, staticBuf, "ID:");
-    C2D_TextParse(&c2dMediatype, staticBuf, "Mediatype:");
+    C2D_TextParse(&checkpoint, staticBuf, "Checkpoint");
+    C2D_TextParse(&c2dId, staticBuf, "ID: ");
+    C2D_TextParse(&c2dMediatype, staticBuf, "位置:");
 
-    C2D_TextParse(&top_move, staticBuf, "\uE006 to move between titles");
-    C2D_TextParse(&top_a, staticBuf, "\uE000 to enter target");
-    C2D_TextParse(&top_y, staticBuf, "\uE003 to multiselect a title");
-    C2D_TextParse(&top_my, staticBuf, "\uE003 hold to multiselect all titles");
-    C2D_TextParse(&top_b, staticBuf, "\uE001 to exit target or deselect all titles");
-    C2D_TextParse(&top_hb, staticBuf, "\uE001 hold to refresh titles");
-    C2D_TextParse(&bot_ts, staticBuf, "\uE01D \uE006 to move\nbetween backups");
-    C2D_TextParse(&bot_x, staticBuf, "\uE002 to delete backups");
+    C2D_TextParse(&top_move, staticBuf, "\uE006 切换应用");
+    C2D_TextParse(&top_a, staticBuf, "\uE000 选择");
+    C2D_TextParse(&top_y, staticBuf, "\uE003 多选");
+    C2D_TextParse(&top_my, staticBuf, "\uE003 按住全选");
+    C2D_TextParse(&top_b, staticBuf, "\uE001 退出选择或取消多选");
+    C2D_TextParse(&top_hb, staticBuf, "\uE001 按住刷新");
+    C2D_TextParse(&bot_ts, staticBuf, "\uE01D \uE006 切换备份");
+    C2D_TextParse(&bot_x, staticBuf, "\uE002 删除备份");
     C2D_TextParse(&coins, staticBuf, "\uE075");
 
     C2D_TextOptimize(&ins1);
@@ -302,7 +302,7 @@ void MainScreen::handleEvents(const InputState& input)
             // If the "New..." entry is selected...
             if (0 == directoryList->index()) {
                 currentOverlay = std::make_shared<YesNoOverlay>(
-                    *this, "Backup selected title?",
+                    *this, "备份当前数据?",
                     [this]() {
                         auto result = io::backup(hid.fullIndex(), 0);
                         if (std::get<0>(result)) {
@@ -316,7 +316,7 @@ void MainScreen::handleEvents(const InputState& input)
             }
             else {
                 currentOverlay = std::make_shared<YesNoOverlay>(
-                    *this, "Restore selected title?",
+                    *this, "恢复所选备份?",
                     [this]() {
                         size_t cellIndex = directoryList->index();
                         auto result      = io::restore(hid.fullIndex(), cellIndex, nameFromCell(cellIndex));
@@ -353,7 +353,7 @@ void MainScreen::handleEvents(const InputState& input)
             // avoid actions if X is pressed on "New..."
             if (index > 0) {
                 currentOverlay = std::make_shared<YesNoOverlay>(
-                    *this, "Delete selected backup?",
+                    *this, "删除所选备份?",
                     [this, isSaveMode, index]() {
                         Title title;
                         getTitle(title, hid.fullIndex());
@@ -431,7 +431,7 @@ void MainScreen::handleEvents(const InputState& input)
         }
         else if (g_bottomScrollEnabled) {
             currentOverlay = std::make_shared<YesNoOverlay>(
-                *this, "Backup selected save?",
+                *this, "备份当前数据?",
                 [this]() {
                     auto result = io::backup(hid.fullIndex(), directoryList->index());
                     if (std::get<0>(result)) {
@@ -453,7 +453,7 @@ void MainScreen::handleEvents(const InputState& input)
         }
         else if (g_bottomScrollEnabled && cellIndex > 0) {
             currentOverlay = std::make_shared<YesNoOverlay>(
-                *this, "Restore selected save?",
+                *this, "恢复所选备份?",
                 [this, cellIndex]() {
                     auto result = io::restore(hid.fullIndex(), cellIndex, nameFromCell(cellIndex));
                     if (std::get<0>(result)) {
@@ -472,7 +472,7 @@ void MainScreen::handleEvents(const InputState& input)
         getTitle(title, hid.fullIndex());
         if ((title.isActivityLog() && buttonPlayCoins->released()) || ((hidKeysDown() & KEY_TOUCH) && input.py < 20 && input.px > 294)) {
             if (!Archive::setPlayCoins()) {
-                currentOverlay = std::make_shared<ErrorOverlay>(*this, -1, "Failed to set play coins.");
+                currentOverlay = std::make_shared<ErrorOverlay>(*this, -1, "无法设置游戏金币.");
             }
         }
         else {
@@ -487,7 +487,7 @@ void MainScreen::handleEvents(const InputState& input)
                         currentOverlay = std::make_shared<CheatManagerOverlay>(*this, key);
                     }
                     else {
-                        currentOverlay = std::make_shared<InfoOverlay>(*this, "No available cheat codes for this title.");
+                        currentOverlay = std::make_shared<InfoOverlay>(*this, "该应用没有可用的金手指.");
                     }
                 }
             }

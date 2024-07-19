@@ -50,7 +50,7 @@ Result servicesInit(void)
     Result res = 0;
 
     if (R_FAILED(res = Archive::init())) {
-        return consoleDisplayError("Archive::init failed.", res);
+        return consoleDisplayError("Archive::init 失败.", res);
     }
     ATEXIT(Archive::exit);
 
@@ -65,7 +65,7 @@ Result servicesInit(void)
     Handle hbldrHandle;
     if (R_FAILED(res = svcConnectToPort(&hbldrHandle, "hb:ldr"))) {
         Logger::getInstance().log(Logger::ERROR, "Error during startup with result 0x%08lX. Rosalina not found on this system.", res);
-        return consoleDisplayError("Rosalina not found on this system.\nAn updated CFW is required to launch Checkpoint.", res);
+        return consoleDisplayError("系统内没有找到 Rosalina.\n请更新 CFW 后再启动 Checkpoint.", res);
     }
 
     romfsInit();

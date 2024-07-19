@@ -241,9 +241,9 @@ std::string Title::mediaTypeString(void)
 {
     switch (mMedia) {
         case MEDIATYPE_SD:
-            return "SD Card";
+            return "SD 卡";
         case MEDIATYPE_GAME_CARD:
-            return "Cartridge";
+            return "游戏卡带";
         case MEDIATYPE_NAND:
             return "NAND";
         default:
@@ -323,8 +323,8 @@ void Title::refreshDirectories(void)
 
             std::sort(mSaves.rbegin(), mSaves.rend());
             std::sort(mFullSavePaths.rbegin(), mFullSavePaths.rend());
-            mSaves.insert(mSaves.begin(), StringUtils::UTF8toUTF16("New..."));
-            mFullSavePaths.insert(mFullSavePaths.begin(), StringUtils::UTF8toUTF16("New..."));
+            mSaves.insert(mSaves.begin(), StringUtils::UTF8toUTF16("新建..."));
+            mFullSavePaths.insert(mFullSavePaths.begin(), StringUtils::UTF8toUTF16("新建..."));
         }
         else {
             Logger::getInstance().log(Logger::ERROR, "Couldn't retrieve the save directory list for the title " + shortDescription());
@@ -359,8 +359,8 @@ void Title::refreshDirectories(void)
 
             std::sort(mExtdata.begin(), mExtdata.end());
             std::sort(mFullExtdataPaths.begin(), mFullExtdataPaths.end());
-            mExtdata.insert(mExtdata.begin(), StringUtils::UTF8toUTF16("New..."));
-            mFullExtdataPaths.insert(mFullExtdataPaths.begin(), StringUtils::UTF8toUTF16("New..."));
+            mExtdata.insert(mExtdata.begin(), StringUtils::UTF8toUTF16("新建..."));
+            mFullExtdataPaths.insert(mFullExtdataPaths.begin(), StringUtils::UTF8toUTF16("新建..."));
         }
         else {
             Logger::getInstance().log(Logger::ERROR, "Couldn't retrieve the extdata directory list for the title " + shortDescription());
