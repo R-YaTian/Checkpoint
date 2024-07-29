@@ -11,6 +11,7 @@ clean:
 	@for dir in $(SUBDIRS); do $(MAKE) clean -C $$dir; done
 	@rm -f sharkive/build/*.json
 	@rm -f 3ds/romfs/cheats/*.bz2
+	@rm -rf 3ds/romfs/gfx
 	@rm -f switch/romfs/cheats/*.bz2 
 
 3ds: 3ds_cheats

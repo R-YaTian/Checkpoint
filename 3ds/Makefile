@@ -72,7 +72,7 @@ ICON_FLAGS          :=	nosavebackups,visible
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-CFLAGS	:=	-g -gdwarf-4 -Wall -Wextra -Wno-psabi -O2 -mword-relocations -flto \
+CFLAGS	:=	-g -gdwarf-4 -Wall -Wextra -Wno-psabi -O2 -mword-relocations -flto=auto \
 			-fomit-frame-pointer -ffunction-sections \
 			$(ARCH) \
 			-DVERSION_MAJOR=${VERSION_MAJOR} \
@@ -83,7 +83,7 @@ CFLAGS	:=	-g -gdwarf-4 -Wall -Wextra -Wno-psabi -O2 -mword-relocations -flto \
 
 CFLAGS	+=	$(INCLUDE) -DARM11 -D__3DS__ -D_GNU_SOURCE=1
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++17
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++23
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
@@ -137,7 +137,10 @@ else
 endif
 #---------------------------------------------------------------------------------
 
-export T3XFILES		:=	$(GFXFILES:.t3s=.t3x)
+export T3XFILES			:=	$(GFXFILES:.t3s=.t3x)
+
+export ROMFS_T3XFILES	:=	$(patsubst %.t3s, $(GFXBUILD)/%.t3x, $(GFXFILES))
+export T3XHFILES		:=	$(patsubst %.t3s, $(BUILD)/%.h, $(GFXFILES))
 
 export OFILES_SOURCES 	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 
@@ -183,7 +186,7 @@ endif
 .PHONY: all clean format cheats
 
 #---------------------------------------------------------------------------------
-all: cheats
+all: $(ROMFS_T3XFILES) $(T3XHFILES)
 	@mkdir -p $(BUILD) $(GFXBUILD) $(OUTDIR)
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile $(OUTPUT).3dsx
 	@bannertool makebanner -i "$(BANNER_IMAGE)" -a "$(BANNER_AUDIO)" -o $(BUILD)/banner.bnr
@@ -192,7 +195,7 @@ all: cheats
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(OUTDIR)
+	@rm -fr $(BUILD) $(OUTDIR) $(GFXBUILD) $(ROMFS)/$(CHEATS)
 #---------------------------------------------------------------------------------
 cheats:
 	@mkdir -p $(BUILD) $(ROMFS)/$(CHEATS)
@@ -205,6 +208,14 @@ endif
 #---------------------------------------------------------------------------------
 format:
 	clang-format -i -style=file $(foreach dir,$(FORMATSOURCES),$(wildcard $(dir)/*.c) $(wildcard $(dir)/*.cpp) $(wildcard $(dir)/*.tcc)) $(foreach dir,$(FORMATINCLUDES),$(wildcard $(dir)/*.h) $(wildcard $(dir)/*.hpp))
+
+#---------------------------------------------------------------------------------
+$(GFXBUILD)/%.t3x	$(BUILD)/%.h	:	%.t3s
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@mkdir -p $(GFXBUILD)
+	@tex3ds -i $< -H $(BUILD)/$*.h -d $(DEPSDIR)/$*.d -o $(GFXBUILD)/$*.t3x
+
 #---------------------------------------------------------------------------------
 else
 
@@ -260,7 +271,7 @@ endef
 %.t3x	%.h	:	%.t3s
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
-	@tex3ds -i $< -H $*.h -d $*.d -o $(TOPDIR)/$(GFXBUILD)/$*.t3x
+	@tex3ds -i $< -H $*.h -d $*.d -o $*.t3x
 
 -include $(DEPSDIR)/*.d
 
