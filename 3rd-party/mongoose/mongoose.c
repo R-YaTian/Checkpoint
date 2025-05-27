@@ -1311,7 +1311,7 @@ static uint32_t blk0(union char64long16 *block, int i) {
   z += (w ^ x ^ y) + blk(i) + 0xCA62C1D6 + rol(v, 5); \
   w = rol(w, 30);
 
-void cs_sha1_transform(uint32_t state[5], const unsigned char buffer[64]) {
+void cs_sha1_transform(uint32_t state[5], const unsigned char* buffer) {
   uint32_t a, b, c, d, e;
   union char64long16 block[1];
 
@@ -9483,7 +9483,7 @@ static void mg_send_file_data(struct mg_connection *nc, FILE *fp) {
 static void mg_do_ssi_include(struct mg_connection *nc, struct http_message *hm,
                               const char *ssi, char *tag, int include_level,
                               const struct mg_serve_http_opts *opts) {
-  char file_name[MG_MAX_PATH], path[MG_MAX_PATH], *p;
+  char file_name[MG_MAX_PATH], path[MG_MAX_PATH+1], *p;
   FILE *fp;
 
   /*
