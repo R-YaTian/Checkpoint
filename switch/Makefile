@@ -52,8 +52,9 @@ CHEATS			:=	cheats
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
-CFLAGS	:=	-g -Wall -Wextra -O3 -ffunction-sections -flto \
-			-Wno-write-strings -Wno-unused-value -Wno-unused-parameter -fomit-frame-pointer \
+CFLAGS	:=	-g -Wall -Wextra -O3 -ffunction-sections \
+			-Wno-write-strings -Wno-unused-value -fomit-frame-pointer \
+			-Wno-unused-parameter \
 			$(ARCH) $(DEFINES) \
 			-DVERSION_MAJOR=${VERSION_MAJOR} \
 			-DVERSION_MINOR=${VERSION_MINOR} \
@@ -63,11 +64,13 @@ CFLAGS	:=	-g -Wall -Wextra -O3 -ffunction-sections -flto \
 			`freetype-config --cflags` \
 			`sdl2-config --cflags` \
 			-DMG_ENABLE_FILESYSTEM \
+			-DJSON_HAS_FILESYSTEM=0 \
+			-DJSON_HAS_EXPERIMENTAL_FILESYSTEM=0 \
 			-DCHEAT_SIZE_DECOMPRESSED=${CHEAT_SIZE_DECOMPRESSED}
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__ -D_GNU_SOURCE=1
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++23
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -std=gnu++20
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-no-as-needed,-Map,$(notdir $*.map)
