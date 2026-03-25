@@ -1,6 +1,6 @@
 /*
  *   This file is part of Checkpoint
- *   Copyright (C) 2017-2025 Bernardo Giordano, FlagBrew
+ *   Copyright (C) 2017-2026 Bernardo Giordano, FlagBrew
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ int main(void)
     // get the user IDs
     std::vector<AccountUid> userIds = Account::ids();
     // set g_currentUId to a default user in case we loaded at least one user
-    if (g_currentUId == 0)
+    if (g_currentUId == 0 && !userIds.empty())
         g_currentUId = userIds.at(0);
 
     Thread networkThread;
@@ -86,6 +86,7 @@ int main(void)
     threadWaitForExit(&networkThread);
     threadClose(&networkThread);
 
+    g_screen.reset();
     servicesExit();
     exit(0);
 }

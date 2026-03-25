@@ -1,6 +1,6 @@
 /*
  *   This file is part of Checkpoint
- *   Copyright (C) 2017-2025 Bernardo Giordano, FlagBrew
+ *   Copyright (C) 2017-2026 Bernardo Giordano, FlagBrew
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -41,6 +41,25 @@ bool io::fileExists(FS_Archive archive, const std::u16string& path)
     return exist;
 }
 
+size_t io::countFiles(FS_Archive arch, const std::u16string& path)
+{
+    size_t count = 0;
+    Directory items(arch, path);
+    if (!items.good()) {
+        return 0;
+    }
+    for (size_t i = 0, sz = items.size(); i < sz; i++) {
+        if (items.folder(i)) {
+            std::u16string subdir = path + items.entry(i) + StringUtils::UTF8toUTF16("/");
+            count += io::countFiles(arch, subdir);
+        }
+        else {
+            count++;
+        }
+    }
+    return count;
+}
+
 void io::copyFile(FS_Archive srcArch, FS_Archive dstArch, const std::u16string& srcPath, const std::u16string& dstPath)
 {
     g_isTransferringFile = true;
@@ -52,22 +71,28 @@ void io::copyFile(FS_Archive srcArch, FS_Archive dstArch, const std::u16string& 
     }
     else {
         Logging::error("Failed to open source file {} during copy with result {}. Skipping...", StringUtils::UTF16toUTF8(srcPath), input.result());
+        g_isTransferringFile = false;
         return;
     }
 
     FSStream output(dstArch, dstPath, FS_OPEN_WRITE, input.size());
     if (output.good()) {
-        size_t slashpos = srcPath.rfind(StringUtils::UTF8toUTF16("/"));
-        g_currentFile   = srcPath.substr(slashpos + 1, srcPath.length() - slashpos - 1);
+        size_t slashpos     = srcPath.rfind(StringUtils::UTF8toUTF16("/"));
+        g_currentFile       = srcPath.substr(slashpos + 1, srcPath.length() - slashpos - 1);
+        g_currentFileSize   = input.size();
+        g_currentFileOffset = 0;
 
         u32 rd;
         u8* buf = new u8[size];
         do {
             rd = input.read(buf, size);
+            if (rd == 0) {
+                break;
+            }
             output.write(buf, rd);
+            g_currentFileOffset += rd;
 
             // avoid freezing the UI
-            // this will be made less horrible next time...
             C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
             g_screen->drawTop();
             C2D_SceneBegin(g_bottom);
@@ -75,6 +100,7 @@ void io::copyFile(FS_Archive srcArch, FS_Archive dstArch, const std::u16string& 
             Gui::frameEnd();
         } while (!input.eof());
         delete[] buf;
+        g_copyCount++;
     }
     else {
         Logging::error(
@@ -149,7 +175,7 @@ Result io::deleteFolderRecursively(FS_Archive arch, const std::u16string& path)
 
     for (size_t i = 0, sz = dir.size(); i < sz; i++) {
         if (dir.folder(i)) {
-            std::u16string newpath = path + StringUtils::UTF8toUTF16("/") + dir.entry(i) + StringUtils::UTF8toUTF16("/");
+            std::u16string newpath = path + dir.entry(i) + StringUtils::UTF8toUTF16("/");
             deleteFolderRecursively(arch, newpath);
             newpath = path + dir.entry(i);
             FSUSER_DeleteDirectory(arch, fsMakePath(PATH_UTF16, newpath.data()));
@@ -195,6 +221,11 @@ std::tuple<bool, Result, std::string> io::backup(size_t index, size_t cellIndex)
                 customPath = isNewFolder ? KeyboardManager::get().keyboard(suggestion) : StringUtils::UTF8toUTF16("");
             }
 
+            if (isNewFolder && customPath.empty()) {
+                FSUSER_CloseArchive(archive);
+                return std::make_tuple(false, 0, "");
+            }
+
             std::u16string dstPath;
             if (!isNewFolder) {
                 // we're overriding an existing folder
@@ -222,6 +253,10 @@ std::tuple<bool, Result, std::string> io::backup(size_t index, size_t cellIndex)
             }
 
             std::u16string copyPath = dstPath + StringUtils::UTF8toUTF16("/");
+
+            g_copyCount    = 0;
+            g_copyTotal    = io::countFiles(archive, StringUtils::UTF8toUTF16("/"));
+            g_transferMode = "Backup";
 
             res = io::copyDirectory(archive, Archive::sdmc(), StringUtils::UTF8toUTF16("/"), copyPath);
             if (R_FAILED(res)) {
@@ -254,6 +289,10 @@ std::tuple<bool, Result, std::string> io::backup(size_t index, size_t cellIndex)
         }
         else {
             customPath = isNewFolder ? KeyboardManager::get().keyboard(suggestion) : StringUtils::UTF8toUTF16("");
+        }
+
+        if (isNewFolder && customPath.empty()) {
+            return std::make_tuple(false, 0, "");
         }
 
         std::u16string dstPath;
@@ -345,6 +384,10 @@ std::tuple<bool, Result, std::string> io::restore(size_t index, size_t cellIndex
             else {
                 deleteFolderRecursively(archive, dstPath);
             }
+
+            g_copyCount    = 0;
+            g_copyTotal    = io::countFiles(Archive::sdmc(), srcPath);
+            g_transferMode = "Restore";
 
             res = io::copyDirectory(Archive::sdmc(), archive, srcPath, dstPath);
             if (R_FAILED(res)) {

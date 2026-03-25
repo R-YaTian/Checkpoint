@@ -1,6 +1,6 @@
 /*
  *   This file is part of Checkpoint
- *   Copyright (C) 2017-2025 Bernardo Giordano, FlagBrew
+ *   Copyright (C) 2017-2026 Bernardo Giordano, FlagBrew
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 
 #include "Screen.hpp"
 #include "logging.hpp"
+#include <atomic>
 #include <citro2d.h>
 #include <memory>
 #include <vector>
@@ -38,11 +39,16 @@ inline bool g_bottomScrollEnabled       = false;
 inline float g_timer                    = 0;
 inline std::string g_selectedCheatKey;
 inline std::vector<std::string> g_selectedCheatCodes;
-inline volatile bool g_isLoadingTitles = false;
-inline int g_loadingTitlesCounter      = 0;
-inline int g_loadingTitlesLimit        = 0;
+inline std::atomic<bool> g_isLoadingTitles = false;
+inline int g_loadingTitlesCounter          = 0;
+inline int g_loadingTitlesLimit            = 0;
 
 inline std::u16string g_currentFile;
 inline bool g_isTransferringFile = false;
+inline size_t g_copyCount        = 0;
+inline size_t g_copyTotal        = 0;
+inline std::string g_transferMode;
+inline u32 g_currentFileOffset = 0;
+inline u32 g_currentFileSize   = 0;
 
 #endif

@@ -1,6 +1,6 @@
 /*
  *   This file is part of Checkpoint
- *   Copyright (C) 2017-2025 Bernardo Giordano, FlagBrew
+ *   Copyright (C) 2017-2026 Bernardo Giordano, FlagBrew
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -41,7 +41,8 @@
 
 class Title {
 public:
-    void init(u8 saveDataType, u64 titleid, AccountUid userID, const std::string& name, const std::string& author);
+    void init(
+        u8 saveDataType, u64 titleid, AccountUid userID, const std::string& name, const std::string& author, u8 spaceId = FsSaveDataSpaceId_User);
     ~Title() = default;
 
     std::string author(void);
@@ -61,6 +62,7 @@ public:
     void saveId(u64 id);
     std::vector<std::string> saves(void);
     u8 saveDataType(void);
+    u8 saveDataSpaceId(void);
     AccountUid userId(void);
     std::string userName(void);
 
@@ -76,10 +78,13 @@ private:
     std::vector<std::string> mSaves;
     std::vector<std::string> mFullSavePaths;
     u8 mSaveDataType;
+    u8 mSaveDataSpaceId;
     std::string mDisplayName;
     u64 mPlayTimeNanoseconds;
     u32 mLastPlayedTimestamp;
 };
+
+typedef enum { FILTER_SAVES, FILTER_BCAT, FILTER_DEVICE, FILTER_SYSTEM } saveTypeFilter_t;
 
 void getTitle(Title& dst, AccountUid uid, size_t i);
 size_t getTitleCount(AccountUid uid);
@@ -91,5 +96,11 @@ bool favorite(AccountUid uid, int i);
 void freeIcons(void);
 SDL_Texture* smallIcon(AccountUid uid, size_t i);
 std::unordered_map<std::string, std::string> getCompleteTitleList(void);
+
+size_t getFilteredTitleCount(AccountUid uid, saveTypeFilter_t filter);
+void getFilteredTitle(Title& dst, AccountUid uid, saveTypeFilter_t filter, size_t i);
+size_t filteredToRawIndex(AccountUid uid, saveTypeFilter_t filter, size_t filteredIdx);
+bool filteredFavorite(AccountUid uid, saveTypeFilter_t filter, int i);
+SDL_Texture* filteredSmallIcon(AccountUid uid, saveTypeFilter_t filter, size_t i);
 
 #endif
