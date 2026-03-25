@@ -61,6 +61,7 @@ CFLAGS	:=	-g -Wall -Wextra -O3 -ffunction-sections \
 			-DVERSION_MICRO=${VERSION_MICRO} \
 			-DGIT_REV=\"${GIT_REV}\" \
 			-DCS_PLATFORM=CS_P_CUSTOM \
+			`$(PREFIX)pkg-config --libs freetype2` \
 			`sdl2-config --cflags` \
 			-DMG_ENABLE_FILESYSTEM \
 			-DJSON_HAS_FILESYSTEM=0 \
