@@ -206,12 +206,12 @@ std::tuple<bool, Result, std::string> io::backup(size_t index, AccountUid uid, s
         if (rc == -1) {
             FileSystem::unmountDevice();
             Logging::error("Failed to mount filesystem during backup. Title id: 0x{:016X}.", title.id());
-            return std::make_tuple(false, -2, "Failed to mount save.");
+            return std::make_tuple(false, -2, "无法挂载存档文件");
         }
     }
     else {
         Logging::error("Failed to mount filesystem during backup with result 0x{:08X}. Title id: 0x{:016X}.", res, title.id());
-        return std::make_tuple(false, res, "Failed to mount save.");
+        return std::make_tuple(false, res, "无法挂载存档文件");
     }
 
     std::string suggestion;
@@ -240,7 +240,7 @@ std::tuple<bool, Result, std::string> io::backup(size_t index, AccountUid uid, s
                 else {
                     FileSystem::unmountDevice();
                     Logging::info("Copy operation aborted by the user through the system keyboard.");
-                    return std::make_tuple(false, 0, "Operation aborted by the user.");
+                    return std::make_tuple(false, 0, "操作被用户终止");
                 }
             }
             else {
@@ -266,7 +266,7 @@ std::tuple<bool, Result, std::string> io::backup(size_t index, AccountUid uid, s
         if (rc != 0) {
             FileSystem::unmountDevice();
             Logging::error("Failed to recursively delete directory {} with result {}.", dstPath, rc);
-            return std::make_tuple(false, (Result)rc, "Failed to delete the existing backup\ndirectory recursively.");
+            return std::make_tuple(false, (Result)rc, "无法递归删除现有备份目录");
         }
     }
 
@@ -279,7 +279,7 @@ std::tuple<bool, Result, std::string> io::backup(size_t index, AccountUid uid, s
         FileSystem::unmountDevice();
         io::deleteFolderRecursively((dstPath + "/").c_str());
         Logging::error("Failed to copy directory {} with result 0x{:08X}. Skipping...", dstPath, res);
-        return std::make_tuple(false, res, "Failed to backup save.");
+        return std::make_tuple(false, res, "无法备份存档");
     }
 
     refreshDirectories(title.id());
@@ -287,16 +287,16 @@ std::tuple<bool, Result, std::string> io::backup(size_t index, AccountUid uid, s
     FileSystem::unmountDevice();
     if (!MS::multipleSelectionEnabled()) {
         blinkLed(4);
-        ret = std::make_tuple(true, 0, "Progress correctly saved to disk.");
+        ret = std::make_tuple(true, 0, "进度成功存储");
     }
 
     auto systemKeyboardAvailable = KeyboardManager::get().isSystemKeyboardAvailable();
     if (!systemKeyboardAvailable.first) {
         return std::make_tuple(true, systemKeyboardAvailable.second,
-            "Progress correctly saved to disk.\nSystem keyboard applet was not\naccessible. The suggested destination\nfolder was used instead.");
+            "进度成功存储\n系统键盘小程序不可用\n已使用推荐的目标文件夹名称");
     }
 
-    ret = std::make_tuple(true, 0, "Progress correctly saved to disk.");
+    ret = std::make_tuple(true, 0, "进度成功存储");
     Logging::info("Backup succeeded.");
     return ret;
 }
@@ -329,12 +329,12 @@ std::tuple<bool, Result, std::string> io::restore(size_t index, AccountUid uid, 
         if (rc == -1) {
             FileSystem::unmountDevice();
             Logging::error("Failed to mount filesystem during restore. Title id: 0x{:016X}.", title.id());
-            return std::make_tuple(false, -2, "Failed to mount save.");
+            return std::make_tuple(false, -2, "无法挂载存档文件");
         }
     }
     else {
         Logging::error("Failed to mount filesystem during restore with result 0x{:08X}. Title id: 0x{:016X}.", res, title.id());
-        return std::make_tuple(false, res, "Failed to mount save.");
+        return std::make_tuple(false, res, "无法挂载存档文件");
     }
 
     std::string srcPath = title.fullPath(cellIndex) + "/";
@@ -344,7 +344,7 @@ std::tuple<bool, Result, std::string> io::restore(size_t index, AccountUid uid, 
     if (R_FAILED(res)) {
         FileSystem::unmountDevice();
         Logging::error("Failed to recursively delete directory {} with result 0x{:08X}.", dstPath, res);
-        return std::make_tuple(false, res, "Failed to delete save.");
+        return std::make_tuple(false, res, "无法删除存档文件");
     }
 
     g_copyCount    = 0;
@@ -354,17 +354,17 @@ std::tuple<bool, Result, std::string> io::restore(size_t index, AccountUid uid, 
     if (R_FAILED(res)) {
         FileSystem::unmountDevice();
         Logging::error("Failed to copy directory {} to {} with result 0x{:08X}. Skipping...", srcPath, dstPath, res);
-        return std::make_tuple(false, res, "Failed to restore save.");
+        return std::make_tuple(false, res, "无法恢复存档数据");
     }
 
     res = fsdevCommitDevice("save");
     if (R_FAILED(res)) {
         Logging::error("Failed to commit save with result 0x{:08X}.", res);
-        return std::make_tuple(false, res, "Failed to commit to save device.");
+        return std::make_tuple(false, res, "无法提交存档数据更改");
     }
     else {
         blinkLed(4);
-        ret = std::make_tuple(true, 0, nameFromCell + "\nhas been restored successfully.");
+        ret = std::make_tuple(true, 0, nameFromCell + "\n已成功恢复");
     }
 
     FileSystem::unmountDevice();

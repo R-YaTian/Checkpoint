@@ -198,7 +198,7 @@ u64 Title::playTimeNanoseconds(void)
 std::string Title::playTime(void)
 {
     const u64 playTimeMinutes = mPlayTimeNanoseconds / 60000000000;
-    return StringUtils::format("%d", playTimeMinutes / 60) + ":" + StringUtils::format("%02d", playTimeMinutes % 60) + " hours";
+    return StringUtils::format("%d", playTimeMinutes / 60) + ":" + StringUtils::format("%02d", playTimeMinutes % 60) + " 小时";
 }
 
 void Title::playTimeNanoseconds(u64 playTimeNanoseconds)
@@ -232,8 +232,8 @@ void Title::refreshDirectories(void)
 
         std::sort(mSaves.rbegin(), mSaves.rend());
         std::sort(mFullSavePaths.rbegin(), mFullSavePaths.rend());
-        mSaves.insert(mSaves.begin(), "New...");
-        mFullSavePaths.insert(mFullSavePaths.begin(), "New...");
+        mSaves.insert(mSaves.begin(), "新建...");
+        mFullSavePaths.insert(mFullSavePaths.begin(), "新建...");
     }
     else {
         Logging::error("Couldn't retrieve the extdata directory list for the title {}", name());

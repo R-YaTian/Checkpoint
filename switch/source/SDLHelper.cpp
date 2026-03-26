@@ -89,15 +89,15 @@ bool SDLH_Init(void)
     SDLH_LoadImage(&s_checkbox, "romfs:/checkbox.png");
     SDL_SetTextureColorMod(s_checkbox, COLOR_BLACK_DARKERR.r, COLOR_BLACK_DARKERR.g, COLOR_BLACK_DARKERR.b);
 
-    plGetSharedFontByType(&fontData, PlSharedFontType_Standard);
+    plGetSharedFontByType(&fontData, PlSharedFontType_ChineseSimplified);
     plGetSharedFontByType(&fontExtData, PlSharedFontType_NintendoExt);
 
     // Load CJK/Korean fallback fonts
     static const PlSharedFontType fallbackTypes[] = {
-        PlSharedFontType_KO,
-        PlSharedFontType_ChineseSimplified,
         PlSharedFontType_ExtChineseSimplified,
         PlSharedFontType_ChineseTraditional,
+        PlSharedFontType_Standard,
+        PlSharedFontType_KO,
     };
     s_numFallbacks = 0;
     for (size_t i = 0; i < sizeof(fallbackTypes) / sizeof(fallbackTypes[0]); i++) {

@@ -30,7 +30,7 @@ static std::map<AccountUid, User> mUsers;
 
 Result Account::init(void)
 {
-    return accountInitialize(AccountServiceType_Application);
+    return accountInitialize(AccountServiceType_Administrator);
 }
 
 void Account::exit(void)

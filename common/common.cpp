@@ -26,6 +26,12 @@
 
 #include "common.hpp"
 
+#if defined(__3DS__)
+#include <3ds.h>
+#elif defined(__SWITCH__)
+#include <switch.h>
+#endif
+
 std::string DateTime::timeStr(void)
 {
     time_t unixTime;
@@ -57,8 +63,20 @@ std::string DateTime::logDateTime(void)
 
 std::string StringUtils::UTF16toUTF8(const std::u16string& src)
 {
-    static std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-    std::string dst = convert.to_bytes(src);
+    ssize_t units = 0;
+    units = utf16_to_utf8(nullptr, reinterpret_cast<const uint16_t*>(src.c_str()), 0);
+    if (units <= 0)
+    {
+        return "";
+    }
+
+    std::string dst(units, '\0');
+    units = utf16_to_utf8(reinterpret_cast<uint8_t*>(&dst[0]), reinterpret_cast<const uint16_t*>(src.c_str()), dst.size());
+    if (units <= 0)
+    {
+        return "";
+    }
+
     return dst;
 }
 

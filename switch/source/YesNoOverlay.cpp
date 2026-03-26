@@ -34,8 +34,8 @@ YesNoOverlay::YesNoOverlay(
     yesFunc = callbackYes;
     noFunc  = callbackNo;
     SDLH_GetTextDimensions(28, text.c_str(), &textw, &texth);
-    buttonYes = std::make_unique<Clickable>(322, 462, 316, 56, COLOR_BLACK_DARK, COLOR_WHITE, "Yes", true);
-    buttonNo  = std::make_unique<Clickable>(642, 462, 316, 56, COLOR_BLACK_DARK, COLOR_WHITE, "No", true);
+    buttonYes = std::make_unique<Clickable>(322, 462, 316, 56, COLOR_BLACK_DARK, COLOR_WHITE, "是", true);
+    buttonNo  = std::make_unique<Clickable>(642, 462, 316, 56, COLOR_BLACK_DARK, COLOR_WHITE, "否", true);
 }
 
 void YesNoOverlay::draw(void) const

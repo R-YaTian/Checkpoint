@@ -80,7 +80,7 @@ void CheatManagerOverlay::draw(void) const
     scrollable->draw(true);
     SDLH_DrawText(20, ceilf(1190 - width), ceilf(664 + (32 - height) / 2), COLOR_WHITE, page.c_str());
     SDLH_DrawText(
-        20, 94, ceilf(664 + (32 - height) / 2), COLOR_WHITE, multiSelected ? "\ue003 to deselect all cheats" : "\ue003 to select all cheats");
+        20, 94, ceilf(664 + (32 - height) / 2), COLOR_WHITE, multiSelected ? "\ue003 全不选金手指" : "\ue003 全选金手指");
 }
 
 void CheatManagerOverlay::update(const InputState& input)
@@ -133,7 +133,7 @@ void CheatManagerOverlay::update(const InputState& input)
             g_selectedCheatCodes.push_back(scrollable->cellName(i));
         }
         me = std::make_shared<YesNoOverlay>(
-            screen, "Do you want to store the cheat file?",
+            screen, "是否要存储金手指文件？",
             []() {
                 CheatManager::getInstance().save(g_selectedCheatKey, g_selectedCheatCodes);
                 g_screen->removeOverlay();
