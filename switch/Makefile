@@ -170,12 +170,6 @@ all: cheats $(BUILD)
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@ $(BUILD) $(OUTDIR)
-ifeq ($(OS),Windows_NT)
-	@cd $(SHARKIVE) && py -3 joiner.py switch
-else
-	@cd $(SHARKIVE) && python3 joiner.py switch
-endif
-	@cd $(SHARKIVE)/$(BUILD) && mv switch.json.bz2 ../../switch/$(ROMFS)/$(CHEATS)/$(CHEATS).json.bz2
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
@@ -184,7 +178,7 @@ clean:
 	@rm -fr $(BUILD) $(OUTDIR)
 #---------------------------------------------------------------------------------
 cheats:
-	@mkdir -p $@ $(ROMFS)/$(CHEATS)
+	@mkdir -p $(ROMFS)/$(CHEATS)
 ifeq ($(OS),Windows_NT)
 	@cd $(SHARKIVE) && py -3 joiner.py switch
 else
