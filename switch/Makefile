@@ -166,7 +166,7 @@ endif
 .PHONY: $(BUILD) clean all format
 
 #---------------------------------------------------------------------------------
-all: cheats $(BUILD)
+all: $(BUILD)
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@ $(BUILD) $(OUTDIR)
