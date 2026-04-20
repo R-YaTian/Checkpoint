@@ -712,21 +712,30 @@ void MainScreen::handleEvents(const InputState& input)
         }
     }
 
-    if ((buttonCheats->released() || (kdown & HidNpadButton_StickR)) && CheatManager::getInstance().cheats() != nullptr) {
-        if (MS::multipleSelectionEnabled()) {
+    if (buttonCheats->released() || (kdown & HidNpadButton_StickR))
+    {
+        if (MS::multipleSelectionEnabled())
+        {
             MS::clearSelectedEntries();
             updateButtons();
         }
-        else {
+        else if (appletGetAppletType() == AppletType_Application && CheatManager::getInstance().cheats() != nullptr)
+        {
             Title title;
             getTitle(title, g_currentUId, rawIndex());
             std::string key = StringUtils::format("%016llX", title.id());
-            if (CheatManager::getInstance().areCheatsAvailable(key)) {
+            if (CheatManager::getInstance().areCheatsAvailable(key))
+            {
                 currentOverlay = std::make_shared<CheatManagerOverlay>(*this, key);
             }
-            else {
+            else
+            {
                 currentOverlay = std::make_shared<InfoOverlay>(*this, "此应用没有可用的金手指代码");
             }
+        }
+        else
+        {
+            currentOverlay = std::make_shared<InfoOverlay>(*this, "小程序模式下无法使用此功能");
         }
     }
 }
